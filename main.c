@@ -1,57 +1,42 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-void initMe(void);
-int yyparse();
+extern void initMe(void);
+extern int yyparse();
+
+extern void astDecompile(struct astNode* node, FILE* outFile);
+extern struct astNode* root;
 
 int main(int argc, char** argv) {
+    FILE* outFile;
+
     initMe();
 
-    if (argc < 2) {
-        printf("Call: ./etapa2 input.txt\n");
+    if (argc < 3) {
+        printf("Call: ./etapa3 input.txt output.txt\n");
         exit(1);
     }
 
-    if ((yyin = fopen(argv[1], "r")) == 0) {
+    if ((yyin = fopen(argv[1], "r")) == NULL) {
         printf("Cannot open file %s...\n", argv[1]);
+        exit(2);
+    }
+
+    if ((outFile = fopen(argv[2], "w")) == NULL) {
+        printf("Cannot open file %s...\n", argv[2]);
         exit(2);
     }
 
     yyparse();
 
-    /*int tok;
-    while (running) {
-        tok = yylex();
-        if (!running) {
-            break;
-        }
-
-        switch (tok) {
-            case KW_CARA:
-            case KW_INTE:
-            case KW_REAL:
-            case KW_SE:
-            case KW_SENAUM:
-            case KW_ENQUANTO:
-            case KW_ENTRADA:
-            case KW_RETORNE:
-            case OPERATOR_LE:
-            case OPERATOR_GE:
-            case OPERATOR_EQ:
-            case OPERATOR_DIF:
-            case LIT_STRING:
-            case LIT_CHAR:
-            case LIT_FLOAT:
-            case LIT_INTEIRO:
-            case TK_IDENTIFIER:
-            default:
-                printf("%d: %s\n", tok, yytext);
-                break;
-        }
-    }*/
-
     printf("File has %d lines.\n", lineNumber);
     printf("Hash table:\n");
     printHash();
+
+    astDecompile(root, outFile);
+
+    fclose(yyin);
+    fclose(outFile);
 
     return 0;
 }
