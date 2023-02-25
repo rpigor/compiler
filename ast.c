@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const char* typesNames[] = { "AST_DECL", "AST_TAIL", "AST_DEC", "AST_CARA", "AST_INTE", "AST_REAL", "AST_LITSYMBOL", "AST_SYMBOL", "AST_VECINITL", "AST_PARAML", "AST_PARAM", "AST_BLOCK", "AST_CMDL", "AST_ASSIGN", "AST_VEC_ASSIGN", "AST_ESCREVA", "AST_SE", "AST_SE_SENAUM", "AST_ENQUANTO", "AST_RETORNE", "AST_VEC_ELEM", "AST_ADD", "AST_SUB", "AST_DIV", "AST_MUL", "AST_LT", "AST_GT", "AST_DIF", "AST_EQ", "AST_GE", "AST_LE", "AST_AND", "AST_OR", "AST_NOT", "AST_BRAC_EXPR", "AST_FUNC_CALL", "AST_ENTRADA", "AST_EXPRL", "AST_ARGL" };
+const char* typesNames[] = { "AST_DECL", "AST_TAIL", "AST_DEC_VAR", "AST_DEC_FUN", "AST_DEC_VEC", "AST_CARA", "AST_INTE", "AST_REAL", "AST_LITSYMBOL", "AST_SYMBOL", "AST_VECINITL", "AST_PARAML", "AST_PARAM", "AST_BLOCK", "AST_CMDL", "AST_ASSIGN", "AST_VEC_ASSIGN", "AST_ESCREVA", "AST_SE", "AST_SE_SENAUM", "AST_ENQUANTO", "AST_RETORNE", "AST_VEC_ELEM", "AST_ADD", "AST_SUB", "AST_DIV", "AST_MUL", "AST_LT", "AST_GT", "AST_DIF", "AST_EQ", "AST_GE", "AST_LE", "AST_AND", "AST_OR", "AST_NOT", "AST_BRAC_EXPR", "AST_FUNC_CALL", "AST_ENTRADA", "AST_EXPRL", "AST_ARGL" };
 
 struct astNode* astCreate(int tokenType, struct hashNode* symbol, struct astNode* c0, struct astNode* c1, struct astNode* c2, struct astNode* c3) {
     struct astNode* newNode;
@@ -28,7 +28,7 @@ void astPrint(struct astNode* node, int level) {
     }
 
     fprintf(stderr, "ast(");
-    fprintf(stderr, "%s\n", typesNames[node->tokenType]);
+    fprintf(stderr, "%s\n", getTypeName(node));
 
     for (int i = 0; i < level; i++) {
         fprintf(stderr, "  ");
@@ -69,7 +69,36 @@ void astDecompile(struct astNode* node, FILE* outFile) {
                 astDecompile(node->child[1], outFile);
             }
             break;
-        case AST_DEC:
+        case AST_DEC_VAR:
+            astDecompile(node->child[0], outFile);
+            fprintf(outFile, "%s", node->symbol->text);
+            fprintf(outFile, " = ");
+            astDecompile(node->child[1], outFile);
+            fprintf(outFile, ";\n");
+            break;
+        case AST_DEC_FUN:
+            astDecompile(node->child[0], outFile);
+            fprintf(outFile, "%s", node->symbol->text);
+            fprintf(outFile, "( ");
+            if (node->child[1]) {
+                astDecompile(node->child[1], outFile);
+            }
+            fprintf(outFile, ") ");
+            astDecompile(node->child[2], outFile);
+            fprintf(outFile, "\n");
+            break;
+        case AST_DEC_VEC:
+            astDecompile(node->child[0], outFile);
+            fprintf(outFile, "%s", node->symbol->text);
+            fprintf(outFile, "[ ");
+            astDecompile(node->child[1], outFile);
+            fprintf(outFile, "] ");
+            if (node->child[2]) {
+                astDecompile(node->child[2], outFile);
+            }
+            fprintf(outFile, ";\n");
+            break;
+        /*case AST_DEC:
             astDecompile(node->child[0], outFile);
             fprintf(outFile, "%s", node->symbol->text);
             if (!node->child[1] || (node->child[1] && node->child[1]->tokenType == AST_PARAML)) { // function call
@@ -95,7 +124,7 @@ void astDecompile(struct astNode* node, FILE* outFile) {
                 fprintf(outFile, ";");
             }
             fprintf(outFile, "\n");
-            break;
+            break;*/
         case AST_CARA:
             fprintf(outFile, "cara ");
             break;
@@ -274,4 +303,8 @@ void astDecompile(struct astNode* node, FILE* outFile) {
         default:
             break;
     }
+}
+
+const char* getTypeName(struct astNode* node) {
+    return typesNames[node->tokenType];
 }

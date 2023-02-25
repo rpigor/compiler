@@ -1,5 +1,7 @@
-etapa3: lex.yy.o y.tab.o hash.o ast.o
-	gcc -o etapa3 lex.yy.o y.tab.o hash.o ast.o
+etapa4: lex.yy.o y.tab.o hash.o ast.o semantic.o
+	gcc -o etapa4 lex.yy.o y.tab.o hash.o ast.o semantic.o
+semantic.o: semantic.c
+	gcc -c semantic.c
 ast.o: ast.c
 	gcc -c ast.c
 hash.o: hash.c
@@ -13,4 +15,4 @@ y.tab.o: y.tab.c
 y.tab.c y.tab.h: parser.y
 	yacc -d parser.y
 clean:
-	rm *.o lex.yy.c lex.yy.h y.tab.c y.tab.h etapa3
+	rm *.o lex.yy.c lex.yy.h y.tab.c y.tab.h etapa4

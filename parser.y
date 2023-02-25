@@ -1,11 +1,9 @@
 %{
 #include "hash.h"
 #include "ast.h"
-#include "lex.yy.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-int yyerror();
 int getLineNumber();
 
 struct astNode* root = NULL;
@@ -80,9 +78,9 @@ tail: dec tail                                              { $$ = astCreate(AST
     |                                                       { $$ = 0; }
     ;
 
-dec: type TK_IDENTIFIER '=' lit ';'                         { $$ = astCreate(AST_DEC, $2, $1, $4, 0, 0); }
-    | type TK_IDENTIFIER '[' litint ']' vecinitl ';'        { $$ = astCreate(AST_DEC, $2, $1, $4, $6, 0); }
-    | type TK_IDENTIFIER '(' paraml ')' block               { $$ = astCreate(AST_DEC, $2, $1, $4, $6, 0); }
+dec: type TK_IDENTIFIER '=' lit ';'                         { $$ = astCreate(AST_DEC_VAR, $2, $1, $4, 0, 0); }
+    | type TK_IDENTIFIER '[' litint ']' vecinitl ';'        { $$ = astCreate(AST_DEC_VEC, $2, $1, $4, $6, 0); }
+    | type TK_IDENTIFIER '(' paraml ')' block               { $$ = astCreate(AST_DEC_FUN, $2, $1, $4, $6, 0); }
     ;
 
 litint: LIT_INTEIRO                                         { $$ = astCreate(AST_LITSYMBOL, $1, 0, 0, 0, 0); }

@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern void initMe(void);
-extern int yyparse();
+void initMe();
+int yyparse();
+void checkSemantic(struct astNode* node);
+int getSemanticErrors();
+void astDecompile(struct astNode* node, FILE* outFile);
 
-extern void astDecompile(struct astNode* node, FILE* outFile);
 extern struct astNode* root;
 
 int main(int argc, char** argv) {
@@ -34,9 +36,16 @@ int main(int argc, char** argv) {
     printHash();
 
     astDecompile(root, outFile);
+    checkSemantic(root);
 
     fclose(yyin);
     fclose(outFile);
+
+    int errors = getSemanticErrors();
+    printf("There were %d semantic errors.\n", errors);
+    if (errors > 0) {
+        exit(4);
+    }
 
     return 0;
 }

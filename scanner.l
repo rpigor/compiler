@@ -28,12 +28,12 @@ int running = 1;
 "=="                        { return OPERATOR_EQ; }
 "!="                        { return OPERATOR_DIF; }
 
-\"(\\\"|[^"])*\"            { yylval.symbol = insertHash(LIT_STRING, yytext); return LIT_STRING; }
-'(.|\\[a-z0-9])'            { yylval.symbol = insertHash(LIT_CHAR, yytext); return LIT_CHAR; }
-(\+|-)?[0-9]*\.[0-9]+       { yylval.symbol = insertHash(LIT_FLOAT, yytext); return LIT_FLOAT; }
-(\+|-)?[0-9]+               { yylval.symbol = insertHash(LIT_INTEIRO, yytext); return LIT_INTEIRO; }
+\"(\\\"|[^"])*\"            { yylval.symbol = insertHash(SYMBOL_LIT_STRING, yytext); return LIT_STRING; }
+'(.|\\[a-z0-9])'            { yylval.symbol = insertHash(SYMBOL_LIT_CARA, yytext); return LIT_CHAR; }
+(\+|-)?[0-9]*\.[0-9]+       { yylval.symbol = insertHash(SYMBOL_LIT_REAL, yytext); return LIT_FLOAT; }
+(\+|-)?[0-9]+               { yylval.symbol = insertHash(SYMBOL_LIT_INTE, yytext); return LIT_INTEIRO; }
 
-[a-z._][a-z0-9._]*          { yylval.symbol = insertHash(TK_IDENTIFIER, yytext); return TK_IDENTIFIER; }
+[a-z._][a-z0-9._]*          { yylval.symbol = insertHash(SYMBOL_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 
 [;()\[\]{}=+\-*/<>&|~]      { return yytext[0]; }
 [ \t,]

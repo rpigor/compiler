@@ -8,7 +8,9 @@
 enum Types {
     AST_DECL = 0,
     AST_TAIL,
-    AST_DEC,
+    AST_DEC_VAR,
+    AST_DEC_FUN,
+    AST_DEC_VEC,
     AST_CARA,
     AST_INTE,
     AST_REAL,
@@ -54,7 +56,6 @@ struct astNode {
 };
 
 struct astNode* astCreate(int tokenType, struct hashNode* symbol, struct astNode* c0, struct astNode* c1, struct astNode* c2, struct astNode* c3);
-
 void astPrint(struct astNode* node, int level);
-
 void astDecompile(struct astNode* node, FILE* outFile);
+const char* getTypeName(struct astNode* node);

@@ -59,3 +59,16 @@ void printHash() {
         }
     }
 }
+
+int checkUndeclaredHash() {
+    int undeclared = 0;
+    for (int i = 0; i < SIZE; i++) {
+        for (struct hashNode* node = hashTable[i]; node; node = node->next) {
+            if (node->tokenType == SYMBOL_IDENTIFIER) {
+                fprintf(stderr, "Semantic error: identifier %s wasn't declared.\n", node->text);
+                undeclared++;
+            }
+        }
+    }
+    return undeclared;
+}
