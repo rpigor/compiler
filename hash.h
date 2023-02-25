@@ -4,12 +4,12 @@
 
 struct hashNode {
     int tokenType;
-    char* symbol;
-    struct hashNode *next;
+    char* text;
+    struct hashNode* next;
 };
 
 void initHash();
-int hashFunction(char* symbol);
-struct hashNode* searchHash(char* symbol);
-struct hashNode* insertHash(int tokenType, char* symbol);
+int hashFunction(char* text);
+struct hashNode* searchHash(char* text);
+struct hashNode* insertHash(int tokenType, char* text);
 void printHash();

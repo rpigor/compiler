@@ -1,11 +1,24 @@
 #include <stdio.h>
 
 void initMe(void);
+int yyparse();
 
-int main() {
+int main(int argc, char** argv) {
     initMe();
 
-    int tok;
+    if (argc < 2) {
+        printf("Call: ./etapa2 input.txt\n");
+        exit(1);
+    }
+
+    if ((yyin = fopen(argv[1], "r")) == 0) {
+        printf("Cannot open file %s...\n", argv[1]);
+        exit(2);
+    }
+
+    yyparse();
+
+    /*int tok;
     while (running) {
         tok = yylex();
         if (!running) {
@@ -34,7 +47,7 @@ int main() {
                 printf("%d: %s\n", tok, yytext);
                 break;
         }
-    }
+    }*/
 
     printf("File has %d lines.\n", lineNumber);
     printf("Hash table:\n");

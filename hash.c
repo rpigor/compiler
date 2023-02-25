@@ -11,19 +11,19 @@ void initHash() {
     }
 }
 
-int hashFunction(char* symbol) {
+int hashFunction(char* text) {
     unsigned long value = 7;
-    for (int i = 0; symbol[i]; i++) {
-        value = value * 31 + symbol[i];
+    for (int i = 0; text[i]; i++) {
+        value = value * 31 + text[i];
     }
 
     return value % SIZE;
 }
 
-struct hashNode* searchHash(char* symbol) {
-    int index = hashFunction(symbol);
+struct hashNode* searchHash(char* text) {
+    int index = hashFunction(text);
     for (struct hashNode* node = hashTable[index]; node; node = node->next) {
-        if (strcmp(node->symbol, symbol) == 0) {
+        if (strcmp(node->text, text) == 0) {
             return node;
         }
     }
@@ -31,18 +31,18 @@ struct hashNode* searchHash(char* symbol) {
     return NULL;
 }
 
-struct hashNode* insertHash(int tokenType, char* symbol) {
-    struct hashNode* node = searchHash(symbol);
+struct hashNode* insertHash(int tokenType, char* text) {
+    struct hashNode* node = searchHash(text);
     if (node != NULL) {
         return node;
     }
 
     node = (struct hashNode*) calloc(1, sizeof(struct hashNode));
 	node->tokenType = tokenType;
-	node->symbol = (char*) calloc(strlen(symbol) + 1, sizeof(char));
-	strcpy(node->symbol, symbol);
+	node->text = (char*) calloc(strlen(text) + 1, sizeof(char));
+	strcpy(node->text, text);
 
-    int index = hashFunction(symbol);
+    int index = hashFunction(text);
 	node->next = hashTable[index];
 	hashTable[index] = node;
 
@@ -54,7 +54,7 @@ void printHash() {
     for (int i = 0; i < SIZE; i++) {
         int j = 0;
         for (struct hashNode* node = hashTable[i]; node; node = node->next) {
-            printf("hashTable[%d][%d] - (%d: %s)\n", i, j, node->tokenType, node->symbol);
+            printf("hashTable[%d][%d] - (%d: %s)\n", i, j, node->tokenType, node->text);
             j++;
         }
     }
