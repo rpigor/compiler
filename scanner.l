@@ -51,17 +51,15 @@ int running = 1;
 
 %%
 
-#include "main.c"
-
-void initMe(void) {
+void initMe() {
     initHash();
 }
 
-int isRunning(void) {
+int isRunning() {
     return running;
 }
 
-int getLineNumber(void) {
+int getLineNumber() {
     return lineNumber;
 }
 

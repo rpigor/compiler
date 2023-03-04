@@ -72,3 +72,24 @@ int checkUndeclaredHash() {
     }
     return undeclared;
 }
+
+struct hashNode* makeTempHash() {
+    static int serialNum = 0;
+    char buffer[256] = "";
+
+    /* It is important that the text of this temporary
+     * is unique. To avoid any conflict with user-
+     * defined nodes, we give it a bizarre name. */
+    sprintf(buffer, "TtE_eMm_EPp%d", serialNum++);
+    return insertHash(SYMBOL_VARIABLE, buffer);
+}
+
+struct hashNode* makeLabelHash() {
+    static int serialNum = 0;
+    char buffer[256] = "";
+
+    /* Same as the makeTempHash() function, this node's
+     * text must be unique, so we give it a weird name. */
+    sprintf(buffer, "lLa_bBe_Ll1_%d", serialNum++);
+    return insertHash(SYMBOL_LABEL, buffer);
+}

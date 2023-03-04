@@ -16,7 +16,8 @@ enum hashSymbols {
     SYMBOL_LIT_INTE,
     SYMBOL_LIT_REAL,
     SYMBOL_LIT_CARA,
-    SYMBOL_LIT_STRING
+    SYMBOL_LIT_STRING,
+    SYMBOL_LABEL
 };
 
 struct hashNode {
@@ -32,3 +33,5 @@ struct hashNode* searchHash(char* text);
 struct hashNode* insertHash(int tokenType, char* text);
 void printHash();
 int checkUndeclaredHash();
+struct hashNode* makeTempHash();
+struct hashNode* makeLabelHash();

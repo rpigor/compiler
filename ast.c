@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const char* typesNames[] = { "AST_DECL", "AST_TAIL", "AST_DEC_VAR", "AST_DEC_FUN", "AST_DEC_VEC", "AST_CARA", "AST_INTE", "AST_REAL", "AST_LITSYMBOL", "AST_SYMBOL", "AST_VECINITL", "AST_PARAML", "AST_PARAM", "AST_BLOCK", "AST_CMDL", "AST_ASSIGN", "AST_VEC_ASSIGN", "AST_ESCREVA", "AST_SE", "AST_SE_SENAUM", "AST_ENQUANTO", "AST_RETORNE", "AST_VEC_ELEM", "AST_ADD", "AST_SUB", "AST_DIV", "AST_MUL", "AST_LT", "AST_GT", "AST_DIF", "AST_EQ", "AST_GE", "AST_LE", "AST_AND", "AST_OR", "AST_NOT", "AST_BRAC_EXPR", "AST_FUNC_CALL", "AST_ENTRADA", "AST_EXPRL", "AST_ARGL" };
+const char* astTypeNames[] = { "AST_DECL", "AST_TAIL", "AST_DEC_VAR", "AST_DEC_FUN", "AST_DEC_VEC", "AST_CARA", "AST_INTE", "AST_REAL", "AST_LITSYMBOL", "AST_SYMBOL", "AST_VECINITL", "AST_PARAML", "AST_PARAM", "AST_BLOCK", "AST_CMDL", "AST_ASSIGN", "AST_VEC_ASSIGN", "AST_ESCREVA", "AST_SE", "AST_SE_SENAUM", "AST_ENQUANTO", "AST_RETORNE", "AST_VEC_ELEM", "AST_ADD", "AST_SUB", "AST_DIV", "AST_MUL", "AST_LT", "AST_GT", "AST_DIF", "AST_EQ", "AST_GE", "AST_LE", "AST_AND", "AST_OR", "AST_NOT", "AST_BRAC_EXPR", "AST_FUNC_CALL", "AST_ENTRADA", "AST_EXPRL", "AST_ARGL", "AST_PRINTL" };
 
 struct astNode* astCreate(int tokenType, struct hashNode* symbol, struct astNode* c0, struct astNode* c1, struct astNode* c2, struct astNode* c3) {
     struct astNode* newNode;
@@ -180,6 +180,12 @@ void astDecompile(struct astNode* node, FILE* outFile) {
             fprintf(outFile, "escreva ");
             astDecompile(node->child[0], outFile);
             break;
+        case AST_PRINTL:
+            astDecompile(node->child[0], outFile);
+            if (node->child[1]) {
+                astDecompile(node->child[1], outFile);
+            }
+            break;
         case AST_SE:
             fprintf(outFile, "entaum ");
             astDecompile(node->child[0], outFile);
@@ -306,5 +312,5 @@ void astDecompile(struct astNode* node, FILE* outFile) {
 }
 
 const char* getTypeName(struct astNode* node) {
-    return typesNames[node->tokenType];
+    return astTypeNames[node->tokenType];
 }

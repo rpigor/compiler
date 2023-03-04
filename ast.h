@@ -5,7 +5,7 @@
 
 #define MAX_CHILDREN 4
 
-enum Types {
+enum astTypes {
     AST_DECL = 0,
     AST_TAIL,
     AST_DEC_VAR,
@@ -46,7 +46,8 @@ enum Types {
     AST_FUNC_CALL,
     AST_ENTRADA,
     AST_EXPRL,
-    AST_ARGL
+    AST_ARGL,
+    AST_PRINTL
 };
 
 struct astNode {

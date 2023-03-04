@@ -1,13 +1,18 @@
+#include "hash.h"
+#include "ast.h"
+#include "semantic.h"
+#include "tac.h"
+#include "y.tab.h"
+#include "lex.yy.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void initMe();
 int yyparse();
-void checkSemantic(struct astNode* node);
-int getSemanticErrors();
-void astDecompile(struct astNode* node, FILE* outFile);
+int getLineNumber();
+void initMe();
 
 extern struct astNode* root;
+extern int lineNumber;
 
 int main(int argc, char** argv) {
     FILE* outFile;
@@ -31,15 +36,17 @@ int main(int argc, char** argv) {
 
     yyparse();
 
-    printf("File has %d lines.\n", lineNumber);
+    printf("File has %d lines.\n", getLineNumber());
     printf("Hash table:\n");
     printHash();
 
     astDecompile(root, outFile);
-    checkSemantic(root);
 
     fclose(yyin);
     fclose(outFile);
+
+    tacPrintBackwards(generateCode(root));
+    checkSemantic(root);
 
     int errors = getSemanticErrors();
     printf("There were %d semantic errors.\n", errors);

@@ -56,6 +56,7 @@ struct astNode* root = NULL;
 %type<ast> cmd
 %type<ast> expr
 %type<ast> exprl
+%type<ast> printl
 %type<ast> argl
 %type<ast> arg
 
@@ -117,7 +118,7 @@ cmdl: cmd ';' cmdl                                          { $$ = astCreate(AST
 
 cmd: TK_IDENTIFIER '=' expr                                 { $$ = astCreate(AST_ASSIGN, $1, $3, 0, 0, 0); }
     | TK_IDENTIFIER '[' expr ']' '=' expr                   { $$ = astCreate(AST_VEC_ASSIGN, $1, $3, $6, 0, 0); }
-    | KW_ESCREVA exprl                                      { $$ = astCreate(AST_ESCREVA, 0, $2, 0, 0, 0); }
+    | KW_ESCREVA printl                                     { $$ = astCreate(AST_ESCREVA, 0, $2, 0, 0, 0); }
     | KW_ENTAUM cmd KW_SE '(' expr ')'                      { $$ = astCreate(AST_SE, 0, $2, $5, 0, 0); }
     | KW_ENTAUM cmd KW_SENAUM cmd KW_SE '(' expr ')'        { $$ = astCreate(AST_SE_SENAUM, 0, $2, $4, $7, 0); }
     | cmd KW_ENQUANTO '(' expr ')'                          { $$ = astCreate(AST_ENQUANTO, 0, $1, $4, 0, 0); }
@@ -148,6 +149,10 @@ expr: lit                                                   { $$ = $1; }
     ;
 
 exprl: expr exprl                                           { $$ = astCreate(AST_EXPRL, 0, $1, $2, 0, 0); }
+    |                                                       { $$ = 0; }
+    ;
+
+printl: expr printl                                         { $$ = astCreate(AST_PRINTL, 0, $1, $2, 0, 0); }
     |                                                       { $$ = 0; }
     ;
 
