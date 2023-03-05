@@ -21,6 +21,7 @@ enum tacTypes {
     TAC_ASSIGN,
     TAC_VEC_ASSIGN,
     TAC_VEC_ELEM,
+    TAC_DEC_VEC,
     TAC_BRAC_EXPR,
     TAC_JMP_FALSE,
     TAC_JMP,
@@ -32,7 +33,8 @@ enum tacTypes {
     TAC_FUNC_CALL,
     TAC_ARG,
     TAC_ENTRADA,
-    TAC_ESCREVA
+    TAC_ESCREVA,
+    TAC_VECINIT
 };
 
 struct tacNode {
