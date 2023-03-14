@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const char* tacTypeNames[] = { "TAC_SYMBOL", "TAC_ADD", "TAC_SUB", "TAC_DIV", "TAC_MUL", "TAC_LT", "TAC_GT", "TAC_DIF", "TAC_EQ", "TAC_GE", "TAC_LE", "TAC_AND", "TAC_OR", "TAC_NOT", "TAC_ASSIGN", "TAC_VEC_ASSIGN", "TAC_VEC_ELEM", "TAC_DEC_VEC", "TAC_BRAC_EXPR", "TAC_JMP_FALSE", "TAC_JMP", "TAC_LABEL", "TAC_RETORNE", "TAC_FUNC_BEGIN", "TAC_FUNC_END", "TAC_PARAM", "TAC_FUNC_CALL", "TAC_ARG", "TAC_ENTRADA", "TAC_ESCREVA", "TAC_VECINIT" };
+const char* tacTypeNames[] = { "TAC_SYMBOL", "TAC_ADD", "TAC_SUB", "TAC_DIV", "TAC_MUL", "TAC_LT", "TAC_GT", "TAC_DIF", "TAC_EQ", "TAC_GE", "TAC_LE", "TAC_AND", "TAC_OR", "TAC_NOT", "TAC_ASSIGN", "TAC_VEC_ASSIGN", "TAC_VEC_ELEM", "TAC_VECINIT", "TAC_DEC_VEC", "TAC_DEC_VAR", "TAC_JMP_FALSE", "TAC_JMP", "TAC_LABEL", "TAC_RETORNE", "TAC_FUNC_BEGIN", "TAC_FUNC_END", "TAC_FUNC_CALL", "TAC_ARG", "TAC_ENTRADA", "TAC_ESCREVA" };
 
 struct tacNode* tacCreate(int type, struct hashNode* result, struct hashNode* firstOp, struct hashNode* secondOp) {
     struct tacNode* newNode;
@@ -92,7 +92,6 @@ int getTacType(struct astNode* node) {
         case AST_AND: return TAC_AND;
         case AST_OR: return TAC_OR;
         case AST_NOT: return TAC_NOT;
-        case AST_BRAC_EXPR: return TAC_BRAC_EXPR;
         case AST_ASSIGN: return TAC_ASSIGN;
         case AST_FUNC_CALL: return TAC_FUNC_CALL;
         case AST_PRINTL: return TAC_ESCREVA;
@@ -199,7 +198,6 @@ struct tacNode* generateCode(struct astNode* node) {
             result = tacJoin(code[0], tacJoin(code[1], tacCreate(getTacType(node), makeTempHash(), code[0] ? code[0]->result : NULL, code[1] ? code[1]->result : NULL)));
             break;
         case AST_NOT:
-        case AST_BRAC_EXPR:
             result = tacJoin(code[0], tacCreate(getTacType(node), makeTempHash(), code[0] ? code[0]->result : NULL, NULL));
             break;
         case AST_ASSIGN:
@@ -210,16 +208,13 @@ struct tacNode* generateCode(struct astNode* node) {
             result = tacJoin(code[0], tacJoin(code[1], tacCreate(TAC_VEC_ASSIGN, node->symbol, code[0] ? code[0]->result : NULL, code[1] ? code[1]->result : NULL)));
             break;
         case AST_DEC_VAR:
-            result = tacJoin(code[1], tacCreate(TAC_ASSIGN, node->symbol, code[1] ? code[1]->result : NULL, NULL));
+            result = tacJoin(code[1], tacCreate(TAC_DEC_VAR, node->symbol, code[1] ? code[1]->result : NULL, NULL));
             break;
         case AST_DEC_VEC:
-            result = tacJoin(code[1], tacJoin(code[2], tacCreate(TAC_DEC_VEC, node->symbol, code[1] ? code[1]->result : NULL, NULL)));
+            result = tacJoin(code[1], tacJoin(tacCreate(TAC_DEC_VEC, node->symbol, code[1] ? code[1]->result : NULL, NULL), code[2]));
             break;
         case AST_DEC_FUN:
             result = makeFunction(node->symbol, code[1], code[2]);
-            break;
-        case AST_PARAM:
-            result = tacJoin(tacCreate(TAC_PARAM, node->symbol, NULL, NULL), code[0]);
             break;
         case AST_ARGL:
         case AST_PRINTL:
