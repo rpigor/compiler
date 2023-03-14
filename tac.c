@@ -211,7 +211,7 @@ struct tacNode* generateCode(struct astNode* node) {
             result = tacJoin(code[1], tacCreate(TAC_DEC_VAR, node->symbol, code[1] ? code[1]->result : NULL, NULL));
             break;
         case AST_DEC_VEC:
-            result = tacJoin(code[1], tacJoin(tacCreate(TAC_DEC_VEC, node->symbol, code[1] ? code[1]->result : NULL, NULL), code[2]));
+            result = tacJoin(tacJoin(tacCreate(TAC_DEC_VEC, node->symbol, code[1] ? code[1]->result : NULL, NULL), code[2]), code[1]);
             break;
         case AST_DEC_FUN:
             result = makeFunction(node->symbol, code[1], code[2]);
