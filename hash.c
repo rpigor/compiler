@@ -93,3 +93,46 @@ struct hashNode* makeLabelHash() {
     sprintf(buffer, "lLa_bBe_Ll1_%d", serialNum++);
     return insertHash(SYMBOL_LABEL, buffer);
 }
+
+void printAsmTempsAndLiterals(FILE* out) {
+    for (int i = 0; i < SIZE; i++) {
+        for (struct hashNode* node = hashTable[i]; node; node = node->next) {
+            if (node->text == strstr(node->text, "TtE_eMm_EPp") || node->tokenType == SYMBOL_FUNCTION) {
+                fprintf(out,    "\t.bss\n"
+                                "\t.globl\t_%s\n"
+                                "\t.type\t_%s, @object\n"
+                                "\t.size\t_%s, 4\n"
+                                "_%s:\n"
+                                "\t.zero\t4\n",
+                        node->text, node->text, node->text, node->text);
+            }
+            else if (node->tokenType == SYMBOL_LIT_INTE) {
+                fprintf(out,    "\t.section\t.rodata\n"
+                                "\t.globl\t_%s\n"
+                                "\t.type\t_%s, @object\n"
+                                "\t.size\t_%s, 4\n"
+                                "_%s:\n"
+                                "\t.long\t%s\n",
+                        node->text, node->text, node->text, node->text, node->text);
+            }
+            else if (node->tokenType == SYMBOL_LIT_REAL) {
+                fprintf(out,    "\t.section\t.rodata\n"
+                                "\t.globl\t_%s\n"
+                                "\t.type\t_%s, @object\n"
+                                "\t.size\t_%s, 4\n"
+                                "_%s:\n"
+                                "\t.float\t%s\n",
+                        node->text, node->text, node->text, node->text, node->text);
+            }
+            else if (node->tokenType == SYMBOL_LIT_CARA) {
+                fprintf(out,    "\t.section\t.rodata\n"
+                                "\t.globl\t_%s\n"
+                                "\t.type\t_%s, @object\n"
+                                "\t.size\t_%s, 4\n"
+                                "_%s:\n"
+                                "\t.long\t%d\n",
+                        node->text, node->text, node->text, node->text, node->text[1]);
+            }
+        }
+    }
+}

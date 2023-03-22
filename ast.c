@@ -1,8 +1,11 @@
 #include "ast.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 const char* astTypeNames[] = { "AST_DECL", "AST_TAIL", "AST_DEC_VAR", "AST_DEC_FUN", "AST_DEC_VEC", "AST_CARA", "AST_INTE", "AST_REAL", "AST_LITSYMBOL", "AST_SYMBOL", "AST_VECINITL", "AST_PARAML", "AST_PARAM", "AST_BLOCK", "AST_CMDL", "AST_ASSIGN", "AST_VEC_ASSIGN", "AST_ESCREVA", "AST_SE", "AST_SE_SENAUM", "AST_ENQUANTO", "AST_RETORNE", "AST_VEC_ELEM", "AST_ADD", "AST_SUB", "AST_DIV", "AST_MUL", "AST_LT", "AST_GT", "AST_DIF", "AST_EQ", "AST_GE", "AST_LE", "AST_AND", "AST_OR", "AST_NOT", "AST_BRAC_EXPR", "AST_FUNC_CALL", "AST_ENTRADA", "AST_EXPRL", "AST_ARGL", "AST_PRINTL" };
+
+int definedStrings = 0;
 
 struct astNode* astCreate(int tokenType, struct hashNode* symbol, struct astNode* c0, struct astNode* c1, struct astNode* c2, struct astNode* c3) {
     struct astNode* newNode;
@@ -313,4 +316,84 @@ void astDecompile(struct astNode* node, FILE* outFile) {
 
 const char* getTypeName(struct astNode* node) {
     return astTypeNames[node->tokenType];
+}
+
+void printAsmDeclarations(struct astNode* node, FILE* out) {
+    printDeclarations(node, out);
+}
+
+void printDeclarations(struct astNode* node, FILE* out) {
+    if (!node) {
+        return;
+    }
+
+    switch (node->tokenType) {
+        case AST_DEC_VAR:
+            fprintf(out,    "\t.data\n"
+                            "\t.globl\t_%s\n"
+                            "\t.type\t_%s, @object\n"
+                            "\t.size\t_%s, 4\n"
+                            "_%s:\n",
+                    node->symbol->text, node->symbol->text, node->symbol->text, node->symbol->text);
+
+            if (node->symbol->dataType == DATATYPE_INTE) {
+                fprintf(out,    "\t.long\t%s\n", node->child[1]->symbol->text);
+            }
+            else if (node->symbol->dataType == DATATYPE_CARA) {
+                fprintf(out,    "\t.long\t%d\n", node->child[1]->symbol->text[1]);
+            }
+            else if (node->symbol->dataType == DATATYPE_REAL) {
+                fprintf(out,    "\t.float\t%s\n", node->child[1]->symbol->text);
+            }
+            break;
+        case AST_DEC_VEC:
+            fprintf(out,    "\t.data\n"
+                            "\t.globl\t_%s\n"
+                            "\t.type\t_%s, @object\n"
+                            "\t.size\t_%s, %d\n"
+                            "_%s:\n",
+                    node->symbol->text, node->symbol->text, node->symbol->text, 4 * atoi(node->child[1]->symbol->text), node->symbol->text);
+
+            for (struct astNode* tempNode = node->child[2]; tempNode; tempNode = tempNode->child[1]) {
+                if (tempNode->child[0]->symbol->text[0] == '\'') {
+                    fprintf(out,    "\t.long\t%d\n", tempNode->child[0]->symbol->text[1]);
+                }
+                else if (strchr(tempNode->child[0]->symbol->text, '.') != NULL) {
+                    fprintf(out,    "\t.float\t%s\n", tempNode->child[0]->symbol->text);
+                }
+                else {
+                    fprintf(out,    "\t.long\t%s\n", tempNode->child[0]->symbol->text);
+                }
+            }
+            break;
+        case AST_PARAM:
+            fprintf(out,    "\t.data\n"
+                            "\t.globl\t_%s\n"
+                            "\t.type\t_%s, @object\n"
+                            "\t.size\t_%s, 4\n"
+                            "_%s:\n",
+                    node->symbol->text, node->symbol->text, node->symbol->text, node->symbol->text);
+
+            if (node->symbol->dataType == DATATYPE_REAL) {
+                fprintf(out,    "\t.float\t0.0\n");
+            }
+            else {
+                fprintf(out,    "\t.long\t0\n");
+            }
+            break;
+        case AST_SYMBOL:
+            if (node->symbol->tokenType == SYMBOL_LIT_STRING) {
+                fprintf(out,    "\t.section\t.rodata\n"
+                                ".defstr%d:\n"
+                                "\t.string %s\n",
+                        definedStrings++, node->symbol->text);
+            }
+            break;
+        default:
+            break;
+    }
+
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        printDeclarations(node->child[i], out);
+    }
 }

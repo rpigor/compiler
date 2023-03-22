@@ -32,6 +32,7 @@ enum tacTypes {
     TAC_FUNC_END,
     TAC_FUNC_CALL,
     TAC_ARG,
+    TAC_PARAM,
     TAC_ENTRADA,
     TAC_ESCREVA
 };
@@ -57,3 +58,6 @@ struct tacNode* makeWhile(struct tacNode* firstCode, struct tacNode* secondCode)
 struct tacNode* makeFunction(struct hashNode* symbol, struct tacNode* parameters, struct tacNode* body);
 
 struct tacNode* generateCode(struct astNode* node);
+
+struct tacNode* tacReverse(struct tacNode* node);
+void generateAsm(struct tacNode* node, FILE* out);

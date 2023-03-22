@@ -37,16 +37,22 @@ int main(int argc, char** argv) {
     yyparse();
 
     printf("File has %d lines.\n", getLineNumber());
-    printf("Hash table:\n");
+
     printHash();
 
-    astDecompile(root, outFile);
+    astDecompile(root, stderr);
+
+    checkSemantic(root);
+
+    struct tacNode* tacRoot = generateCode(root);
+    tacPrintBackwards(tacRoot);
+    tacRoot = tacReverse(tacRoot);
+    printAsmDeclarations(root, outFile);
+    printAsmTempsAndLiterals(outFile);
+    generateAsm(tacRoot, outFile);
 
     fclose(yyin);
     fclose(outFile);
-
-    tacPrintBackwards(generateCode(root));
-    checkSemantic(root);
 
     int errors = getSemanticErrors();
     printf("There were %d semantic errors.\n", errors);

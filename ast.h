@@ -60,3 +60,5 @@ struct astNode* astCreate(int tokenType, struct hashNode* symbol, struct astNode
 void astPrint(struct astNode* node, int level);
 void astDecompile(struct astNode* node, FILE* outFile);
 const char* getTypeName(struct astNode* node);
+void printAsmDeclarations(struct astNode* node, FILE* out);
+void printDeclarations(struct astNode* node, FILE* out);

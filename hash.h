@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #define SIZE 547
 
 enum hashDataTypes {
@@ -35,3 +37,4 @@ void printHash();
 int checkUndeclaredHash();
 struct hashNode* makeTempHash();
 struct hashNode* makeLabelHash();
+void printAsmTempsAndLiterals(FILE* out);
