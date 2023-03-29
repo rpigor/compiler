@@ -5,10 +5,12 @@
 
 const char* tacTypeNames[] = { "TAC_SYMBOL", "TAC_ADD", "TAC_SUB", "TAC_DIV", "TAC_MUL", "TAC_LT", "TAC_GT", "TAC_DIF", "TAC_EQ", "TAC_GE", "TAC_LE", "TAC_AND", "TAC_OR", "TAC_NOT", "TAC_ASSIGN", "TAC_VEC_ASSIGN", "TAC_VEC_ELEM", "TAC_VECINIT", "TAC_DEC_VEC", "TAC_DEC_VAR", "TAC_JMP_FALSE", "TAC_JMP", "TAC_LABEL", "TAC_RETORNE", "TAC_FUNC_BEGIN", "TAC_FUNC_END", "TAC_FUNC_CALL", "TAC_ARG", "TAC_PARAM", "TAC_ENTRADA", "TAC_ESCREVA" };
 
-const char* functionCallRegisters[] = { "edi", "esi", "edx", "ecx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15" };
+const char* functionCallRegisters[] = { "edi", "esi", "edx", "ecx", "r8d", "r9d" };
 
+const int sizeFunctionCallRegisters = sizeof(functionCallRegisters) / sizeof(functionCallRegisters[0]);
 int actualDefineString = 0;
 int argIndex = 0;
+int lastArgIndex = 0;
 int paramIndex = 0;
 
 struct tacNode* tacCreate(int type, struct hashNode* result, struct hashNode* firstOp, struct hashNode* secondOp) {
@@ -383,22 +385,43 @@ void generateAsm(struct tacNode* node, FILE* out) {
                 break;
             case TAC_FUNC_END:
                 fprintf(out,    "\tpopq\t%%rbp\n"
-                                "\tret\n"
-                        );
+                                "\tret\n");
                 paramIndex = 0;
                 break;
             case TAC_PARAM:
-                fprintf(out,    "\tmovl\t%%%s, _%s(%%rip)\n",
-                        functionCallRegisters[paramIndex++], tac->result->text);
+                if (paramIndex >= sizeFunctionCallRegisters) {
+                    fprintf(out,    "\tmovl\t%d(%%rbp), %%eax\n"
+                                    "\tmovl\t%%eax, _%s(%%rip)\n",
+                            8*(lastArgIndex - paramIndex + 1), tac->result->text);
+                }
+                else {
+                    fprintf(out,    "\tmovl\t%%%s, _%s(%%rip)\n",
+                            functionCallRegisters[paramIndex], tac->result->text);
+                }
+                paramIndex++;
                 break;
             case TAC_ARG:
-                fprintf(out,    "\tmovl\t_%s(%%rip), %%%s\n",
-                        tac->firstOp->text, functionCallRegisters[argIndex++]);
+                if (argIndex >= sizeFunctionCallRegisters) {
+                    fprintf(out,    "\tpushq\t_%s(%%rip)\n",
+                            tac->firstOp->text);
+                }
+                else {
+                    fprintf(out,    "\tmovl\t_%s(%%rip), %%%s\n",
+                            tac->firstOp->text, functionCallRegisters[argIndex]);
+                }
+                argIndex++;
                 break;
             case TAC_FUNC_CALL:
                 fprintf(out,    "\tcall\t%s\n"
                                 "\tmovl\t%%eax, _%s(%%rip)\n",
                         tac->result->text, tac->result->text);
+
+                 if (argIndex >= sizeFunctionCallRegisters) {
+                    fprintf(out,    "\taddq\t$%d, %%rsp\n",
+                            8*(argIndex - sizeFunctionCallRegisters));
+                }
+                
+                lastArgIndex = argIndex;
                 argIndex = 0;
                 break;
             case TAC_RETORNE:
